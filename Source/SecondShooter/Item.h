@@ -7,6 +7,15 @@
 #include "Engine/DataTable.h"
 #include "Item.generated.h"
 
+class AShooterCharacter;
+class UBoxComponent;
+class UWidgetComponent;
+class USphereComponent;
+class UCurveFloat;
+class USoundCue;
+class UCurveVector;
+class UDataTable;
+
 UENUM(BlueprintType)
 enum class EItemRarity : uint8
 {
@@ -78,7 +87,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/** Called from the AShooterCharacter class */
-	void StartItemCurve(class AShooterCharacter* Char, bool bForcePlaySound = false);
+	void StartItemCurve(AShooterCharacter* Char, bool bForcePlaySound = false);
 
 	// Called in AShooterCharacter::GetPickupItem()
 	void PlayEquipSound(bool bForcePlaySound = false);
@@ -96,15 +105,15 @@ private:
 
 	/** Line trace collides with box to show HUD widgets */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class UBoxComponent* CollisionBox;
+	UBoxComponent* CollisionBox;
 
 	/** Popup widget for when the player looks at the item */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class UWidgetComponent* PickupWidget;
+	UWidgetComponent* PickupWidget;
 
 	/** Enables item tracing when overlapped */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class USphereComponent* AreaSphere;
+	USphereComponent* AreaSphere;
 
 	/** The name which appears on the Pickup Widget */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
@@ -127,7 +136,7 @@ private:
 
 	/** The curve asset to use for the item's Z location when interping */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class UCurveFloat* ItemZCurve;
+	UCurveFloat* ItemZCurve;
 
 	/** Starting location when interping begins */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
@@ -164,7 +173,7 @@ private:
 
 	/** Sound played when item is picked up */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class USoundCue* PickupSound;
+	USoundCue* PickupSound;
 
 	/** Sound played when the item is equipped */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
@@ -194,7 +203,7 @@ private:
 
 	/** Curve to drive the dynamic material parameters */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class UCurveVector* PulseCurve;
+	UCurveVector* PulseCurve;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	UCurveVector* InterpPulseCurve;
@@ -232,7 +241,7 @@ private:
 
 	/** Item Rarity data table */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DataTable", meta = (AllowPrivateAccess = "true"))
-	class UDataTable* ItemRarityDataTable;
+	UDataTable* ItemRarityDataTable;
 
 	/** Color in the glow material */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rarity", meta = (AllowPrivateAccess = "true"))

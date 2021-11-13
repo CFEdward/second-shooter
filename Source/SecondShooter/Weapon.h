@@ -9,6 +9,9 @@
 #include "WeaponType.h"
 #include "Weapon.generated.h"
 
+class USoundCue;
+class UParticleSystem;
+
 USTRUCT(BlueprintType)
 struct FWeaponDataTable : public FTableRowBase
 {
@@ -24,7 +27,7 @@ struct FWeaponDataTable : public FTableRowBase
 	int32 MagazineCapacity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class USoundCue* PickupSound;
+	USoundCue* PickupSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USoundCue* EquipSound;
 
@@ -69,6 +72,15 @@ struct FWeaponDataTable : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* CrosshairsTop;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AutoFireRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UParticleSystem* MuzzleFlash;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundCue* FireSound;
 
 };
 
@@ -153,6 +165,18 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DataTable", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* CrosshairsTop;
 
+	/** The speed at which automatic fire happens */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DataTable", meta = (AllowPrivateAccess = "true"))
+	float AutoFireRate;
+
+	/** Particle system spawned at the BarrelSocket */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DataTable", meta = (AllowPrivateAccess = "true"))
+	UParticleSystem* MuzzleFlash;
+
+	/** Sound played when the weapon is fired */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DataTable", meta = (AllowPrivateAccess = "true"))
+	USoundCue* FireSound;
+
 protected:
 
 	void StopFalling();
@@ -176,5 +200,11 @@ public:
 	FORCEINLINE void SetClipBoneName(FName Name) { ClipBoneName = Name; }
 
 	FORCEINLINE void SetMovingClip(bool Move) { bMovingClip = Move; }
+
+	FORCEINLINE float GetAutoFireRate() const { return AutoFireRate; }
+
+	FORCEINLINE UParticleSystem* GetMuzzleFlash() const { return MuzzleFlash; }
+
+	FORCEINLINE USoundCue* GetFireSound() const { return FireSound; }
 
 };

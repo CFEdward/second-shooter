@@ -7,6 +7,8 @@
 #include "WeaponType.h"
 #include "ShooterAnimInstance.generated.h"
 
+class AShooterCharacter;
+
 UENUM(BlueprintType)
 enum class EOffsetState : uint8
 {
@@ -38,7 +40,7 @@ public:
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	class AShooterCharacter* ShooterCharacter;
+	AShooterCharacter* ShooterCharacter;
 
 	/** The speed of the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))

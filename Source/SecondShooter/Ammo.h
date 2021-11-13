@@ -7,6 +7,8 @@
 #include "AmmoType.h"
 #include "Ammo.generated.h"
 
+class USphereComponent;
+
 /**
  * 
  */
@@ -41,7 +43,7 @@ private:
 
 	/** Overlap sphere for picking up the ammo */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo", meta = (AllowPrivateAccess = "true"))
-	class USphereComponent* AmmoCollisionSphere;
+	USphereComponent* AmmoCollisionSphere;
 
 protected:
 

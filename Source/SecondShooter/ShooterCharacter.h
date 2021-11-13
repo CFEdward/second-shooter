@@ -7,6 +7,16 @@
 #include "AmmoType.h"
 #include "ShooterCharacter.generated.h"
 
+class UInputComponent;
+class AItem;
+class USpringArmComponent;
+class UCameraComponent;
+class USoundCue;
+class UParticleSystem;
+class UAnimMontage;
+class AWeapon;
+class AAmmo;
+
 UENUM(BlueprintType)
 enum class ECombatState : uint8
 {
@@ -49,7 +59,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	/** Adds/subtracts to/from OverlappedItemCount and updates bShouldTraceForItems */
 	void IncrementOverlappedItemCount(int8 Amount);
@@ -57,7 +67,7 @@ public:
 	// No longer needed; AItem has GetInterpLocation()
 	// FVector GetCameraInterpLocation();
 
-	void GetPickupItem(class AItem* Item);
+	void GetPickupItem(AItem* Item);
 
 	/** Returns the index in InterpLocations array with the lowest ItemCount */
 	int32 GetInterpLocationIndex();
@@ -73,11 +83,11 @@ private:
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+	USpringArmComponent* CameraBoom;
 
 	/** Camera that follows the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+	UCameraComponent* FollowCamera;
 
 	/** Base turn rate in deg/sec. Other scaling may affect final turn rate */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
@@ -117,17 +127,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"), meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
 	float MouseAimingLookUpRate;
 
-	/** Randomize gunshot sound cue */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	class USoundCue* FireSound;
-
-	/** Flash spawned at BarrelSocket */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	class UParticleSystem* MuzzleFlash;
-
 	/** Montage for firing the weapon */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	class UAnimMontage* HipFireMontage;
+	UAnimMontage* HipFireMontage;
 
 	/** Particles spawned upon bullet impact */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
@@ -186,9 +188,6 @@ private:
 	/** True when we can fire. False when waiting for the timer */
 	bool bShouldFire;
 
-	/** Rate of automatic gun fire */
-	float AutomaticFireRate;
-
 	/** Sets a timer between gunshots */
 	FTimerHandle AutoFireTimer;
 
@@ -204,7 +203,7 @@ private:
 
 	/** Currently equipped weapon */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	class AWeapon* EquippedWeapon;
+	AWeapon* EquippedWeapon;
 
 	/** Set this in Blueprints for the default Weapon class */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
@@ -477,7 +476,7 @@ protected:
 	void Aim();
 	void StopAiming();
 
-	void PickupAmmo(class AAmmo* Ammo);
+	void PickupAmmo(AAmmo* Ammo);
 
 	void InitializeInterpLocations();
 
