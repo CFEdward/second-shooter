@@ -184,6 +184,37 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DataTable", meta = (AllowPrivateAccess = "true"))
 	FName BoneToHide;
 
+	/** Amount that the slide is pushed back during pistol fire */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pistol", meta = (AllowPrivateAccess = "true"))
+	float SlideDisplacement;
+
+	/** Curve for the slide displacement */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol", meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* SlideDisplacementCurve;
+
+	/** Timer handle for updating SlideDisplacement */
+	FTimerHandle SlideTimer;
+
+	/** Time for displacing the slide during pistol fire */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol", meta = (AllowPrivateAccess = "true"))
+	float SlideDisplacementTime;
+
+	/** True when moving the pistol slide */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pistol", meta = (AllowPrivateAccess = "true"))
+	bool bMovingSlide;
+
+	/** Max distance for the slide on the pistol */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol", meta = (AllowPrivateAccess = "true"))
+	float MaxSlideDisplacement;
+
+	/** Max rotation for pistol recoil */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol", meta = (AllowPrivateAccess = "true"))
+	float MaxRecoilRotation;
+
+	/** Amount that the pistol will rotate during pistol fire */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pistol", meta = (AllowPrivateAccess = "true"))
+	float RecoilRotation;
+
 protected:
 
 	void StopFalling();
@@ -191,6 +222,10 @@ protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	virtual void BeginPlay() override;
+
+	void FinishMovingSlide();
+
+	void UpdateSlideDisplacement();
 
 public:
 
@@ -215,5 +250,7 @@ public:
 	FORCEINLINE UParticleSystem* GetMuzzleFlash() const { return MuzzleFlash; }
 
 	FORCEINLINE USoundCue* GetFireSound() const { return FireSound; }
+
+	void StartSlideTimer();
 
 };
