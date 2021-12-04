@@ -494,6 +494,9 @@ protected:
 
 	void HighlightInventorySlot();
 
+	UFUNCTION(BlueprintCallable)
+	EPhysicalSurface GetSurfaceType();
+
 public:	
 
 	/** Returns CameraBoom Subobject */
