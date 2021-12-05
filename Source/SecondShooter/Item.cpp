@@ -95,8 +95,13 @@ void AItem::BeginPlay()
 	StartPulseTimer();
 }
 
-void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AItem::OnSphereOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult)
 {
 	if (OtherActor)
 	{
@@ -108,8 +113,11 @@ void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	}
 }
 
-void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void AItem::OnSphereEndOverlap(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
 {
 	if (OtherActor)
 	{
@@ -408,8 +416,11 @@ void AItem::OnConstruction(const FTransform& Transform)
 	// Load the data in the Item Rarity Data Table
 	// Path to the Item Rarity Data Table
 	FString RarityTablePath(TEXT("DataTable'/Game/_Game/DataTables/ItemRarityDataTable.ItemRarityDataTable'"));
-	UDataTable* RarityTableObject = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr,
+	UDataTable* RarityTableObject = Cast<UDataTable>(StaticLoadObject(
+		UDataTable::StaticClass(),
+		nullptr,
 		*RarityTablePath));
+
 	if (RarityTableObject)
 	{
 		FItemRarityTable* RarityRow = nullptr;
@@ -510,7 +521,8 @@ void AItem::UpdatePulse()
 	{
 		DynamicMaterialInstance->SetScalarParameterValue(TEXT("GlowAmount"), CurveValue.X * GlowAmount);
 		DynamicMaterialInstance->SetScalarParameterValue(TEXT("FresnelExponent"), CurveValue.Y * FresnelExponent);
-		DynamicMaterialInstance->SetScalarParameterValue(TEXT("FresnelReflectFraction"),
+		DynamicMaterialInstance->SetScalarParameterValue(
+			TEXT("FresnelReflectFraction"),
 			CurveValue.Z * FresnelReflectFraction);
 	}
 }

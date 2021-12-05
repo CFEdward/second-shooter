@@ -19,6 +19,7 @@
 #include "Ammo.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "SecondShooter.h"
+#include "BulletHitInterface.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()	:
@@ -262,8 +263,9 @@ void AShooterCharacter::FireWeapon()
 	StartCrosshairBulletFire();
 }
 
-bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation)
+bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, FHitResult& OutHitResult)
 {
+	FVector OutBeamLocation;
 	// Check for crosshair trace hit
 	FHitResult CrosshairHitResult;
 	bool bCrosshairHit = TraceUnderCrosshairs(CrosshairHitResult, OutBeamLocation);
@@ -279,20 +281,23 @@ bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, 
 	}
 
 	// Perform a second trace, this time from the gun barrel
-	FHitResult WeaponTraceHit;
 	const FVector WeaponTraceStart{ MuzzleSocketLocation };
 	const FVector StartToEnd{ OutBeamLocation - MuzzleSocketLocation };
 	const FVector WeaponTraceEnd{ MuzzleSocketLocation + StartToEnd * 1.25f };
-	GetWorld()->LineTraceSingleByChannel(WeaponTraceHit, WeaponTraceStart, WeaponTraceEnd,
+	GetWorld()->LineTraceSingleByChannel(
+		OutHitResult,
+		WeaponTraceStart,
+		WeaponTraceEnd,
 		ECollisionChannel::ECC_Visibility);
-	if (WeaponTraceHit.bBlockingHit)	// object between and BeamEndPoint?
-	{
-		OutBeamLocation = WeaponTraceHit.Location;
 
-		return true;
+	if (!OutHitResult.bBlockingHit)	// object between and BeamEndPoint?
+	{
+		OutHitResult.Location = OutBeamLocation;
+
+		return false;
 	}
 
-	return false;
+	return true;
 }
 
 void AShooterCharacter::AimingButtonPressed()
@@ -348,7 +353,9 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 	Velocity.Z = 0.f;
 
 	// Calculate crosshair velocity factor
-	CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(WalkSpeedRange, VelocityMultiplierRange,
+	CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(
+		WalkSpeedRange,
+		VelocityMultiplierRange,
 		Velocity.Size());
 
 	// Calculate crosshair in air factor
@@ -385,7 +392,11 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 		CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.f, DeltaTime, 60.f);
 	}
 
-	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor
+	CrosshairSpreadMultiplier =
+		0.5f
+		+ CrosshairVelocityFactor
+		+ CrosshairInAirFactor
+		- CrosshairAimFactor
 		+ CrosshairShootingFactor;
 }
 
@@ -393,7 +404,10 @@ void AShooterCharacter::StartCrosshairBulletFire()
 {
 	bFiringBullet = true;
 
-	GetWorldTimerManager().SetTimer(CrosshairShootTimer, this, &AShooterCharacter::FinishCrosshairBulletFire,
+	GetWorldTimerManager().SetTimer(
+		CrosshairShootTimer,
+		this,
+		&AShooterCharacter::FinishCrosshairBulletFire,
 		ShootTimeDuration);
 }
 
@@ -419,7 +433,11 @@ void AShooterCharacter::StartFireTimer()
 	if (EquippedWeapon == nullptr) return;
 	CombatState = ECombatState::ECS_FireTimerInProgress;
 
-	GetWorldTimerManager().SetTimer(AutoFireTimer, this, &AShooterCharacter::AutoFireReset, EquippedWeapon->GetAutoFireRate());
+	GetWorldTimerManager().SetTimer(
+		AutoFireTimer,
+		this,
+		&AShooterCharacter::AutoFireReset,
+		EquippedWeapon->GetAutoFireRate());
 }
 
 void AShooterCharacter::AutoFireReset()
@@ -455,8 +473,11 @@ bool AShooterCharacter::TraceUnderCrosshairs(FHitResult& OutHitResult, FVector& 
 	FVector CrosshairWorldDirection;
 
 	// Get world position and direction of crosshairs
-	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0),
-		CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation,
+		CrosshairWorldPosition,
+		CrosshairWorldDirection);
 
 	if (bScreenToWorld)
 	{
@@ -678,23 +699,38 @@ void AShooterCharacter::SendBullet()
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EquippedWeapon->GetMuzzleFlash(), SocketTransform);
 		}
 
-		FVector BeamEnd;
-		bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamEnd);
+		FHitResult BeamHitResult;
+		bool bBeamEnd = GetBeamEndLocation(SocketTransform.GetLocation(), BeamHitResult);
 		if (bBeamEnd)
 		{
-			// Spawn impact particles after updating BeamEndPoint
-			if (ImpactParticles)
+			// Does hit Actor implement BulletHitInterface?
+			if (BeamHitResult.Actor.IsValid())
 			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEnd);
+				IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
+				if (BulletHitInterface)
+				{
+					BulletHitInterface->BulletHit_Implementation(BeamHitResult);
+				}
+				else
+				{
+					// Spawn default particles
+					if (ImpactParticles)
+					{
+						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamHitResult.Location);
+					}
+				}
 			}
 
 			if (BeamParticles)
 			{
-				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles,
+				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					BeamParticles,
 					SocketTransform);
+
 				if (Beam)
 				{
-					Beam->SetVectorParameter(FName("Target"), BeamEnd);
+					Beam->SetVectorParameter(FName("Target"), BeamHitResult.Location);
 				}
 			}
 		}
@@ -904,8 +940,11 @@ void AShooterCharacter::InterpCapsuleHalfHeight(float DeltaTime)
 		TargetCapsuleHalfHeight = StandingCapsuleHalfHeight;
 	}
 
-	const float InterpHalfHeight{ FMath::FInterpTo(GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
-		TargetCapsuleHalfHeight, DeltaTime, 20.f) };
+	const float InterpHalfHeight{
+		FMath::FInterpTo(GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
+		TargetCapsuleHalfHeight,
+		DeltaTime,
+		20.f) };
 
 	// Negative value if crouching; Positive value if standing
 	const float DeltaCapsuleHalfHeight{ InterpHalfHeight - GetCapsuleComponent()->GetScaledCapsuleHalfHeight() };
@@ -1023,8 +1062,11 @@ void AShooterCharacter::FiveKeyPressed()
 
 void AShooterCharacter::ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex)
 {
-	const bool bCanExchangeItems = (CurrentItemIndex != NewItemIndex) && (NewItemIndex < Inventory.Num())
+	const bool bCanExchangeItems =
+		(CurrentItemIndex != NewItemIndex)
+		&& (NewItemIndex < Inventory.Num())
 		&& (CombatState == ECombatState::ECS_Unoccupied || CombatState == ECombatState::ECS_Equipping);
+
 	if (bCanExchangeItems)
 	{
 		if (bAiming)
@@ -1123,14 +1165,20 @@ void AShooterCharacter::IncrementInterpLocItemCount(int32 Index, int32 Amount)
 void AShooterCharacter::StartPickupSoundTimer()
 {
 	bShouldPlayPickupSound = false;
-	GetWorldTimerManager().SetTimer(PickupSoundTimer, this, &AShooterCharacter::ResetPickupSoundTimer,
+	GetWorldTimerManager().SetTimer(
+		PickupSoundTimer,
+		this,
+		&AShooterCharacter::ResetPickupSoundTimer,
 		PickupSoundResetTime);
 }
 
 void AShooterCharacter::StartEquipSoundTimer()
 {
 	bShouldPlayEquipSound = false;
-	GetWorldTimerManager().SetTimer(EquipSoundTimer, this, &AShooterCharacter::ResetEquipSoundTimer,
+	GetWorldTimerManager().SetTimer(
+		EquipSoundTimer,
+		this,
+		&AShooterCharacter::ResetEquipSoundTimer,
 		EquipSoundResetTime);
 }
 
