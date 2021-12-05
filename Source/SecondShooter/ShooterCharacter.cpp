@@ -20,6 +20,7 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "SecondShooter.h"
 #include "BulletHitInterface.h"
+#include "Enemy.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()	:
@@ -53,8 +54,8 @@ AShooterCharacter::AShooterCharacter()	:
 	ShootTimeDuration(.05f),
 	bFiringBullet(false),
 	// Automatic fire variables
-	bShouldFire(true),
 	bFireButtonPressed(false),
+	bShouldFire(true),
 	// Item trace variables
 	bShouldTraceForItems(false),
 	OverlappedItemCount(0),
@@ -717,6 +718,31 @@ void AShooterCharacter::SendBullet()
 					if (ImpactParticles)
 					{
 						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamHitResult.Location);
+					}
+				}
+
+				AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
+				if (HitEnemy)
+				{
+					if (BeamHitResult.BoneName.ToString() == HitEnemy->GetHeadBone())
+					{
+						// Head shot
+						UGameplayStatics::ApplyDamage(
+							BeamHitResult.Actor.Get(),
+							EquippedWeapon->GetHeadShotDamage(),
+							GetController(),
+							this,
+							UDamageType::StaticClass());
+					}
+					else
+					{
+						// Body shot
+						UGameplayStatics::ApplyDamage(
+							BeamHitResult.Actor.Get(),
+							EquippedWeapon->GetDamage(),
+							GetController(),
+							this,
+							UDamageType::StaticClass());
 					}
 				}
 			}
