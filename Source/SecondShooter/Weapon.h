@@ -121,6 +121,8 @@ public:
 
 	bool ClipIsFull();
 
+	void StartSlideTimer();
+
 private:
 
 	FTimerHandle ThrowWeaponTimer;
@@ -277,7 +279,5 @@ public:
 	FORCEINLINE float GetDamage() const { return Damage; }
 
 	FORCEINLINE float GetHeadShotDamage() const { return HeadShotDamage; }
-
-	void StartSlideTimer();
 
 };

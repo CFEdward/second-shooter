@@ -9,6 +9,8 @@
 
 class UParticleSystem;
 class USoundCue;
+class UBehaviorTree;
+class AEnemyController;
 
 UCLASS()
 class SECONDSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
@@ -20,6 +22,23 @@ public:
 
 	// Sets default values for this character's properties
 	AEnemy();
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void BulletHit_Implementation(FHitResult HitResult) override;
+
+	virtual float TakeDamage(
+		float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowHitNumber(int32 Damage, FVector HitLocation, bool bHeadShot);
 
 private:
 
@@ -71,6 +90,16 @@ private:
 	UPROPERTY(EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	float HitNumberDestroyTime;
 
+	/** Behavior tree for the AI Character */
+	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true"))
+	UBehaviorTree* BehaviorTree;
+
+	/** Point for the enemy to move to */
+	UPROPERTY(EditAnywhere, Category = "Behavior Tree", meta = (AllowPrivateAccess = "true", MakeEditWidget = "true"))
+	FVector PatrolPoint;
+
+	AEnemyController* EnemyController;
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -99,23 +128,8 @@ protected:
 
 public:	
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	virtual void BulletHit_Implementation(FHitResult HitResult) override;
-
-	virtual float TakeDamage(
-		float DamageAmount,
-		struct FDamageEvent const& DamageEvent,
-		AController* EventInstigator,
-		AActor* DamageCauser) override;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void ShowHitNumber(int32 Damage, FVector HitLocation, bool bHeadShot);
-
 	FORCEINLINE FString GetHeadBone() const { return HeadBone; }
+
+	FORCEINLINE UBehaviorTree* GetBehaviorTree() const { return BehaviorTree; }
 
 };

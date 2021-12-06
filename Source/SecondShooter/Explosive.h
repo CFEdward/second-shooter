@@ -21,6 +21,11 @@ public:
 	// Sets default values for this actor's properties
 	AExplosive();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void BulletHit_Implementation(FHitResult HitResult) override;
+
 private:
 
 	/** Explosion when hit by a bullet */
@@ -38,9 +43,6 @@ protected:
 
 public:
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void BulletHit_Implementation(FHitResult HitResult) override;
+	
 
 };
