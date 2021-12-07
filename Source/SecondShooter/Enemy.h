@@ -13,6 +13,7 @@ class UBehaviorTree;
 class AEnemyController;
 class USphereComponent;
 class UBoxComponent;
+class AShooterCharacter;
 
 UCLASS()
 class SECONDSHOOTER_API AEnemy : public ACharacter, public IBulletHitInterface
@@ -143,8 +144,29 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* LeftWeaponCollision;
 
+	/** Collision volume for the right weapon */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* RightWeaponCollision;
+
+	/** Base damage for the enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	float BaseDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	FName LeftWeapHitParticleSocket;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	FName RightWeapHitParticleSocket;
+
+	/** True when Enemy can attack */
+	UPROPERTY(VisibleAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	bool bCanAttack;
+
+	FTimerHandle AttackWaitTimer;
+
+	/** Minimum wait time between attacks */
+	UPROPERTY(EditAnywhere, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	float AttackWaitTime;
 
 protected:
 
@@ -221,6 +243,25 @@ protected:
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+
+	/** Activate/deactivate collision for weapon boxes */
+	UFUNCTION(BlueprintCallable)
+	void ActivateLeftWeapon();
+	UFUNCTION(BlueprintCallable)
+	void DeactivateLeftWeapon();
+	UFUNCTION(BlueprintCallable)
+	void ActivateRightWeapon();
+	UFUNCTION(BlueprintCallable)
+	void DeactivateRightWeapon();
+
+	void DoDamage(AShooterCharacter* Victim);
+
+	void SpawnBlood(AShooterCharacter* Victim, FName SocketName);
+
+	/** Attempt to stun character */
+	void StunCharacter(AShooterCharacter* Victim);
+
+	void ResetCanAttack();
 
 public:	
 

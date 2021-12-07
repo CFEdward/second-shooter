@@ -17,10 +17,10 @@ AItem::AItem() :
 	ItemRarity(EItemRarity::EIR_Uncommon),
 	ItemState(EItemState::EIS_Pickup),
 	// Item interp variables
-	ZCurveTime(.7f),
 	ItemInterpStartLocation(FVector(0.f)),
 	CameraTargetLocation(FVector(0.f)),
 	bInterping(false),
+	ZCurveTime(.7f),
 	ItemInterpX(0.f),
 	ItemInterpY(0.f),
 	InterpInitialYawOffset(0.f),
@@ -29,10 +29,10 @@ AItem::AItem() :
 	MaterialIndex(0),
 	bCanChangeCustomDepth(true),
 	// Dynamic Material parameters
+	PulseCurveTime(5.f),
 	GlowAmount(150.f),
 	FresnelExponent(3.f),
 	FresnelReflectFraction(4.f),
-	PulseCurveTime(5.f),
 	SlotIndex(0),
 	bCharacterInventoryFull(false)
 {

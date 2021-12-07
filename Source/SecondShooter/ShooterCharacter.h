@@ -24,6 +24,7 @@ enum class ECombatState : uint8
 	ECS_FireTimerInProgress		UMETA(DisplayName = "FireTimerInProgress"),
 	ECS_Reloading				UMETA(DisplayName = "Reloading"),
 	ECS_Equipping				UMETA(DisplayName = "Equipping"),
+	ECS_Stunned					UMETA(DisplayName = "Stunned"),
 
 	ECS_MAX						UMETA(DisplayName = "DefaultMAX")
 };
@@ -78,6 +79,15 @@ public:
 	void StartEquipSoundTimer();
 
 	void UnHighlightInventorySlot();
+
+	// Take combat damage
+	virtual float TakeDamage(
+		float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		AController* EvemtInstigator,
+		AActor* DamageCauser) override;
+
+	void Stun();
 
 private:
 
@@ -347,6 +357,30 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	int32 HighlightedSlot;
 
+	/** Character health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float Health;
+
+	/** Character max health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float MaxHealth;
+
+	/** Sound made when character gets hit by a melee attack */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	USoundCue* MeleeImpactSound;
+
+	/** Blood splatter particles for melee hit */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UParticleSystem* BloodParticles;
+
+	/** Hit react anim montage for when the character gets stunned */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* HitReactMontage;
+
+	/** Chance of being stunned when hit by an enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float StunChance;
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -497,6 +531,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	EPhysicalSurface GetSurfaceType();
 
+	UFUNCTION(BlueprintCallable)
+	void EndStun();
+
 public:	
 
 	/** Returns CameraBoom Subobject */
@@ -523,5 +560,11 @@ public:
 	FORCEINLINE bool ShouldPlayEquipSound() const { return bShouldPlayEquipSound; }
 
 	FORCEINLINE AWeapon* GetEquippedWeapon() const { return EquippedWeapon; }
+
+	FORCEINLINE USoundCue* GetMeleeImpactSound() const { return MeleeImpactSound; }
+
+	FORCEINLINE UParticleSystem* GetBloodParticles() const { return BloodParticles; }
+
+	FORCEINLINE float GetStunChance() const { return StunChance; }
 
 };
