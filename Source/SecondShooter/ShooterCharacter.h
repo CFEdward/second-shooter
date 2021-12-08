@@ -84,7 +84,7 @@ public:
 	virtual float TakeDamage(
 		float DamageAmount,
 		struct FDamageEvent const& DamageEvent,
-		AController* EvemtInstigator,
+		AController* EventInstigator,
 		AActor* DamageCauser) override;
 
 	void Stun();
@@ -381,6 +381,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float StunChance;
 
+	/** Montage for character death */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* DeathMontage;
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -533,6 +537,11 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void EndStun();
+
+	void Die();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishDeath();
 
 public:	
 
