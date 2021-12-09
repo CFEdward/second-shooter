@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "BulletHitInterface.generated.h"
 
+//class AController;
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UBulletHitInterface : public UInterface
@@ -25,6 +27,6 @@ class SECONDSHOOTER_API IBulletHitInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void BulletHit(FHitResult HitResult);
+	void BulletHit(FHitResult HitResult, AController* ShooterController, AActor* Shooter);
 
 };
