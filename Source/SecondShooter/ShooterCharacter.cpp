@@ -515,7 +515,7 @@ void AShooterCharacter::TraceForItems()
 		TraceUnderCrosshairs(ItemTraceResult, HitLocation);
 		if (ItemTraceResult.bBlockingHit)
 		{
-			TraceHitItem = Cast<AItem>(ItemTraceResult.Actor);
+			TraceHitItem = Cast<AItem>(ItemTraceResult.GetActor());
 			const auto TraceHitWeapon = Cast<AWeapon>(TraceHitItem);
 			if (TraceHitWeapon)
 			{
@@ -712,9 +712,9 @@ void AShooterCharacter::SendBullet()
 		if (bBeamEnd)
 		{
 			// Does hit Actor implement BulletHitInterface?
-			if (BeamHitResult.Actor.IsValid())
+			if (IsValid(BeamHitResult.GetActor()))
 			{
-				IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.Actor.Get());
+				IBulletHitInterface* BulletHitInterface = Cast<IBulletHitInterface>(BeamHitResult.GetActor());
 				if (BulletHitInterface)
 				{
 					BulletHitInterface->BulletHit_Implementation(BeamHitResult, GetController(), this);
@@ -728,7 +728,7 @@ void AShooterCharacter::SendBullet()
 					}
 				}
 
-				AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.Actor.Get());
+				AEnemy* HitEnemy = Cast<AEnemy>(BeamHitResult.GetActor());
 				if (HitEnemy)
 				{
 					int32 Damage{};
@@ -737,7 +737,7 @@ void AShooterCharacter::SendBullet()
 						// Head shot
 						Damage = EquippedWeapon->GetHeadShotDamage();
 						UGameplayStatics::ApplyDamage(
-							BeamHitResult.Actor.Get(),
+							BeamHitResult.GetActor(),
 							Damage,
 							GetController(),
 							this,
@@ -750,7 +750,7 @@ void AShooterCharacter::SendBullet()
 						// Body shot
 						Damage = EquippedWeapon->GetDamage();
 						UGameplayStatics::ApplyDamage(
-							BeamHitResult.Actor.Get(),
+							BeamHitResult.GetActor(),
 							Damage,
 							GetController(),
 							this,

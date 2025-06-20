@@ -7,8 +7,9 @@ public class SecondShooter : ModuleRules
 	public SecondShooter(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "PhysicsCore", "NavigationSystem", "AIModule" });
+        CppStandard = CppStandardVersion.Cpp20;
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "PhysicsCore", "NavigationSystem", "AIModule" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

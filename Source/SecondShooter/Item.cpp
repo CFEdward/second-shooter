@@ -588,9 +588,9 @@ void AItem::StartItemCurve(AShooterCharacter* Char, bool bForcePlaySound)
 	GetWorldTimerManager().SetTimer(ItemInterpTimer, this, &AItem::FinishInterping, ZCurveTime);
 
 	// Get initial Yaw of the Camera
-	const float CameraRotationYaw{ Character->GetFollowCamera()->GetComponentRotation().Yaw };
+	const float CameraRotationYaw{ (float)Character->GetFollowCamera()->GetComponentRotation().Yaw };
 	// Get initial Yaw of the Item
-	const float ItemRotationYaw{ GetActorRotation().Yaw };
+	const float ItemRotationYaw{ (float)GetActorRotation().Yaw };
 	// Initial Yaw offset between Camera and Item
 	InterpInitialYawOffset = ItemRotationYaw - CameraRotationYaw;
 
